@@ -6,7 +6,7 @@
   --texto-suave: #667085;
   --borda: #e3e7ee;
   --destaque: #f7931a;   /* laranja do Bitcoin */
-  --alta: #16a34a;
+  --alta: #15803d;       /* verde mais escuro: lê bem sobre fundo branco */
   --queda: #dc2626;
 }
 
@@ -18,6 +18,9 @@
     --texto: #e8edf4;
     --texto-suave: #9aa6b6;
     --borda: #263040;
+    /* No escuro, o contrário: cores mais claras para destacar do fundo */
+    --alta: #4ade80;
+    --queda: #f87171;
   }
 }
 
@@ -83,7 +86,7 @@ button, input[type="date"] {
 button { cursor: pointer; }
 button:hover { border-color: var(--destaque); }
 button:focus-visible, input:focus-visible { outline: 2px solid var(--destaque); outline-offset: 2px; }
-button.ativo, #botao-aplicar { background: var(--destaque); border-color: var(--destaque); color: #fff; }
+button.ativo, #botao-aplicar { background: var(--destaque); border-color: var(--destaque); color: #1c2430; font-weight: 600; } /* texto escuro sobre o laranja: contraste bom */
 
 /* Gráficos */
 .graficos { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 16px; }

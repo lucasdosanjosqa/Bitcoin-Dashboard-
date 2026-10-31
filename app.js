@@ -95,7 +95,10 @@ function guardarCacheSalvo(url, dados) {
 async function buscarPrecoAtual() {
   const url = `${API}/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true`;
   const dados = await buscarJson(url);
-  return { preco: dados.bitcoin.usd, variacao24h: dados.bitcoin.usd_24h_change };
+  // Se a API mandar algo diferente do esperado, avisa em vez de quebrar no meio
+  if (!dados.bitcoin || typeof dados.bitcoin.usd !== "number") throw new Error("Resposta inesperada");
+  // A variação pode faltar: nesse caso fica null e a tela mostra "--"
+  return { preco: dados.bitcoin.usd, variacao24h: dados.bitcoin.usd_24h_change ?? null };
 }
 
 // Preços entre duas datas (datas em milissegundos). Devolve [[tempo, preço], ...]
@@ -107,6 +110,7 @@ async function buscarPrecos(deMs, ateMs) {
   const ate = Math.floor(ateMs / 1000 / BLOCO) * BLOCO;
   const url = `${API}/coins/bitcoin/market_chart/range?vs_currency=usd&from=${de}&to=${ate}`;
   const dados = await buscarJson(url);
+  if (!Array.isArray(dados.prices)) throw new Error("Resposta inesperada");
   return dados.prices;
 }
 
@@ -116,14 +120,21 @@ async function buscarPrecos(deMs, ateMs) {
 function mostrarPrecoAtual({ preco, variacao24h }) {
   el("preco-atual").textContent = formatarDolar(preco);
 
-  const sinal = variacao24h >= 0 ? "+" : "";
   const campo = el("variacao-24h");
+  if (variacao24h == null) {
+    campo.textContent = "-- (24h)";
+    campo.className = "variacao";
+    return;
+  }
+  const sinal = variacao24h >= 0 ? "+" : "";
   campo.textContent = `${sinal}${variacao24h.toFixed(2)}% (24h)`;
   campo.className = "variacao " + (variacao24h >= 0 ? "alta" : "queda");
 }
 
-// Quanto o preço mudou, em %, do primeiro ao último ponto da lista
+// Quanto o preço mudou, em %, do primeiro ao último ponto da lista.
+// Com menos de 2 pontos não dá para comparar: devolve null
 function calcularVariacao(precos) {
+  if (precos.length < 2) return null;
   const primeiro = precos[0][1];
   const ultimo = precos[precos.length - 1][1];
   return ((ultimo - primeiro) / primeiro) * 100;
@@ -132,6 +143,11 @@ function calcularVariacao(precos) {
 // Escreve uma porcentagem num cartão, com cor de alta/queda
 function mostrarVariacaoNoCartao(idCartao, variacao) {
   const campo = el(idCartao);
+  if (variacao == null) {
+    campo.textContent = "--";
+    campo.className = "";
+    return;
+  }
   const sinal = variacao >= 0 ? "+" : "";
   campo.textContent = `${sinal}${variacao.toFixed(2)}%`;
   campo.className = variacao >= 0 ? "alta" : "queda";
@@ -344,24 +360,46 @@ function ligarSeletor() {
 
 // ---------- Início ----------
 
-async function iniciar() {
-  const agora = Date.now();
-  const seteDiasAtras = agora - 7 * DIA_MS;
-
+// Cada parte da página tem o seu próprio try/catch: se uma falhar,
+// as outras continuam aparecendo (só a que falhou mostra o aviso)
+async function carregarPrecoAtual() {
   try {
-    mostrarAviso("");
     mostrarPrecoAtual(await buscarPrecoAtual());
+  } catch (erro) {
+    tratarErro(erro);
+  }
+}
 
-    // Semana
-    const precosSemana = await buscarPrecos(seteDiasAtras, agora);
+async function carregarSemana() {
+  const agora = Date.now();
+  try {
+    const precosSemana = await buscarPrecos(agora - 7 * DIA_MS, agora);
+    if (precosSemana.length < 2) {
+      mostrarAviso("Não há dados suficientes para o gráfico da semana.");
+      return;
+    }
     graficoSemanal = desenharGrafico("grafico-semanal", precosSemana, graficoSemanal);
     mostrarVariacaoNoCartao("cartao-7d", calcularVariacao(precosSemana));
+  } catch (erro) {
+    tratarErro(erro);
+  }
+}
 
-    // Período escolhido (começa com 1 ano)
+async function carregarPeriodoInicial() {
+  try {
+    // Começa com o máximo permitido (quase 1 ano)
     await aplicarPeriodoEmDias(DIAS_MAXIMOS);
   } catch (erro) {
     tratarErro(erro);
   }
+}
+
+async function iniciar() {
+  mostrarAviso("");
+  // Um de cada vez (e não todos juntos) para não estourar o limite de pedidos da API
+  await carregarPrecoAtual();
+  await carregarSemana();
+  await carregarPeriodoInicial();
 }
 
 ligarSeletor();
