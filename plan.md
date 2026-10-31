@@ -22,7 +22,7 @@ Prioridades: simplicidade, boa visualização, fácil para iniciantes.
 - Preço atual: `GET https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true`
 
 **Limites conhecidos:**
-- Sem chave, o histórico vai até ~365 dias atrás. Por isso "anual" = últimos 365 dias.
+- Sem chave, o histórico vai até ~365 dias atrás. Por isso "anual" = últimos 364 dias (1 dia de folga; o botão "1 ano" usa esse valor).
 - Há limite de chamadas por minuto (erro 429). Usar cache em memória e mostrar aviso amigável.
 
 ## Arquivos
