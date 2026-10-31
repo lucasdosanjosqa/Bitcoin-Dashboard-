@@ -1,0 +1,106 @@
+/* Cores em um só lugar: para mudar o visual, mude aqui */
+:root {
+  --fundo: #f4f6fa;
+  --caixa: #ffffff;
+  --texto: #1c2430;
+  --texto-suave: #667085;
+  --borda: #e3e7ee;
+  --destaque: #f7931a;   /* laranja do Bitcoin */
+  --alta: #16a34a;
+  --queda: #dc2626;
+}
+
+/* Modo escuro automático, se o aparelho estiver em modo escuro */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fundo: #0f141b;
+    --caixa: #18202b;
+    --texto: #e8edf4;
+    --texto-suave: #9aa6b6;
+    --borda: #263040;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+main, .topo { max-width: 1100px; margin: 0 auto; padding: 16px; }
+
+/* Topo */
+.topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.topo h1 { margin: 0; font-size: 1.5rem; color: var(--destaque); }
+.preco-atual { display: flex; align-items: baseline; gap: 10px; }
+.preco-atual strong { font-size: 1.6rem; }
+.rotulo { color: var(--texto-suave); font-size: 0.85rem; }
+
+/* Alta e queda (o JavaScript troca estas classes depois) */
+.variacao { font-weight: 600; }
+.alta { color: var(--alta); }
+.queda { color: var(--queda); }
+
+/* Aviso de erro */
+.aviso {
+  background: #fef3c7; color: #78350f;
+  border: 1px solid #fcd34d; border-radius: 8px;
+  padding: 10px 14px; margin: 0 0 16px;
+}
+
+/* Estado de carregamento */
+.carregando { color: var(--texto-suave); margin: 0 0 16px; font-weight: 600; }
+body.ocupado .area-grafico,
+body.ocupado .tabela-rolagem { opacity: 0.5; transition: opacity 0.2s; }
+button:disabled { opacity: 0.5; cursor: wait; }
+
+/* Cartões: 2 por linha no celular, 4 no computador */
+.cartoes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+.cartao, .caixa {
+  background: var(--caixa); border: 1px solid var(--borda);
+  border-radius: 12px; padding: 14px;
+}
+.cartao { display: flex; flex-direction: column; gap: 4px; }
+.cartao strong { font-size: 1.25rem; }
+
+/* Seletor de período */
+.seletor {
+  display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between;
+  background: var(--caixa); border: 1px solid var(--borda);
+  border-radius: 12px; padding: 14px; margin-bottom: 16px;
+}
+.botoes-rapidos, .datas { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.datas label { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; }
+
+button, input[type="date"] {
+  font: inherit; color: var(--texto); background: var(--fundo);
+  border: 1px solid var(--borda); border-radius: 8px; padding: 6px 12px;
+}
+button { cursor: pointer; }
+button:hover { border-color: var(--destaque); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--destaque); outline-offset: 2px; }
+button.ativo, #botao-aplicar { background: var(--destaque); border-color: var(--destaque); color: #fff; }
+
+/* Gráficos */
+.graficos { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 16px; }
+.caixa h2 { margin: 0 0 10px; font-size: 1.05rem; }
+.area-grafico { position: relative; height: 280px; }
+
+/* Tabela */
+.tabela-rolagem { max-height: 360px; overflow: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--borda); }
+thead th { position: sticky; top: 0; background: var(--caixa); color: var(--texto-suave); font-size: 0.85rem; }
+.vazio { text-align: center; color: var(--texto-suave); padding: 24px; }
+
+.rodape { text-align: center; color: var(--texto-suave); font-size: 0.8rem; padding: 20px 16px; }
+
+/* Telas maiores: 4 cartões e 2 gráficos lado a lado */
+@media (min-width: 800px) {
+  .cartoes { grid-template-columns: repeat(4, 1fr); }
+  .graficos { grid-template-columns: 1fr 1fr; }
+}

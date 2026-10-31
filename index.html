@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard Bitcoin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topo">
+    <h1>₿ Dashboard Bitcoin</h1>
+    <div class="preco-atual">
+      <span class="rotulo">Preço agora</span>
+      <strong id="preco-atual">--</strong>
+      <span id="variacao-24h" class="variacao">--</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- Mensagens de erro ou aviso aparecem aqui -->
+    <p id="aviso" class="aviso" role="alert" hidden></p>
+    <!-- Aparece enquanto os dados estão sendo buscados -->
+    <p id="carregando" class="carregando" role="status" hidden>Carregando dados…</p>
+
+    <!-- Cartões com os números principais -->
+    <section class="cartoes" aria-label="Resumo">
+      <article class="cartao"><span class="rotulo">Variação 7 dias</span><strong id="cartao-7d">--</strong></article>
+      <article class="cartao"><span class="rotulo" id="rotulo-periodo">Variação no período</span><strong id="cartao-1a">--</strong></article>
+      <article class="cartao"><span class="rotulo">Máxima do período</span><strong id="cartao-max">--</strong></article>
+      <article class="cartao"><span class="rotulo">Mínima do período</span><strong id="cartao-min">--</strong></article>
+    </section>
+
+    <!-- Escolha do período -->
+    <section class="seletor" aria-label="Escolher período">
+      <div class="botoes-rapidos">
+        <button type="button" data-dias="7">7 dias</button>
+        <button type="button" data-dias="30">30 dias</button>
+        <button type="button" data-dias="90">90 dias</button>
+        <button type="button" data-dias="365">1 ano</button>
+      </div>
+      <div class="datas">
+        <label>De <input type="date" id="data-inicio"></label>
+        <label>Até <input type="date" id="data-fim"></label>
+        <button type="button" id="botao-aplicar">Aplicar</button>
+      </div>
+    </section>
+
+    <!-- Gráficos -->
+    <section class="graficos">
+      <article class="caixa">
+        <h2>Variação semanal</h2>
+        <div class="area-grafico"><canvas id="grafico-semanal"></canvas></div>
+      </article>
+      <article class="caixa">
+        <h2 id="titulo-periodo">Variação anual</h2>
+        <div class="area-grafico"><canvas id="grafico-anual"></canvas></div>
+      </article>
+    </section>
+
+    <!-- Tabela de dados históricos -->
+    <section class="caixa">
+      <h2>Dados históricos</h2>
+      <div class="tabela-rolagem">
+        <table>
+          <thead>
+            <tr><th title="Dia pelo horário mundial (UTC)">Data (UTC)</th><th>Preço (US$)</th><th>Variação diária</th></tr>
+          </thead>
+          <tbody id="tabela-corpo">
+            <tr><td colspan="3" class="vazio">Os dados vão aparecer aqui.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">Dados: CoinGecko (API gratuita). Valores em dólar americano.</footer>
+
+  <!-- Bibliotecas de gráficos, com versão fixa -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <!-- Nossa lógica: precisa vir depois das bibliotecas -->
+  <script src="app.js"></script>
+</body>
+</html>
